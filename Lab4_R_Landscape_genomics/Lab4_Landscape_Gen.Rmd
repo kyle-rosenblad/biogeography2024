@@ -470,3 +470,5 @@ YOUR ANSWER HERE
 Pretend you are a restoration practitioner planning a meadow restoration project in the Sierra Nevada, and you need to collect willow planting material. What kind of environment would you go to if you want willows that are resistant to both summer drought and spring freezes? Use these results, and the information in the lab intro slides, to inform your answer.
 
 YOUR ANSWER HERE
+
+**When you are done, make sure to save your document, and then click Knit above, and choose Knit to Word. When it asks if you want to download the file, say yes and save it. This is what you'll submit on bCourses. Before you submit, make sure your answers look as intended.**
