@@ -3,7 +3,6 @@ title: "Lab4"
 author: "Kyle Rosenblad"
 notes: "R intro material adapted from Will Freyman, Carrie Tribble, & Ixchel Gonzalez-Ramirez"
 date: "2024-09-23"
-output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
