@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Running code in RStudio
 
-To run the code below and see its output, either click the green triangular "run" button, or click inside the code chunk and hit ctrl+enter (PC) or command+enter (Mac)
+To run the code below and see its output, either click the green triangular "run" button, or click inside the code chunk and hit ctrl+shift+enter (PC) or command+shift+enter (Mac)
 
 ```{r}
 print("Hello world")
