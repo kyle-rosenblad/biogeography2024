@@ -36,7 +36,7 @@ If you wanted to change your working directory (we don't need to do this), you c
 
 We'll need to install the BEDASSLE package, among others:
 
-```{r}
+```{r, echo=FALSE}
 install.packages("BEDASSLE", repos="http://cran.us.r-project.org")
 install.packages("patchwork", repos="http://cran.us.r-project.org")
 ```
