@@ -1,0 +1,473 @@
+---
+title: "Lab4"
+author: "Kyle Rosenblad"
+notes: "R intro material adapted from Will Freyman, Carrie Tribble, & Ixchel Gonzalez-Ramirez"
+date: "2024-09-23"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Intro to R
+
+## Running code in RStudio
+
+To run the code below and see its output, either click the green triangular "run" button, or click inside the code chunk and hit ctrl+enter (PC) or command+enter (Mac)
+
+```{r}
+print("Hello world")
+```
+
+## Working directory and packages
+
+First, check your working directory. This is the folder or "directory" where the files you want to work with are located on your computer, or the computing environment you are using. Substitute the example directory below with your own.
+
+```{r}
+getwd()
+```
+
+If you wanted to change your working directory (we don't need to do this), you could delete the hashtag (which turns code into a not-run comment) at the beginning of this line, substitute in your own desired working directory, and run it:
+
+```{r}
+#setwd("C:/Users/Kyle/Documents/mywd")
+```
+
+We'll need to install the BEDASSLE package, among others:
+
+```{r}
+install.packages("BEDASSLE", repos="http://cran.us.r-project.org")
+install.packages("patchwork", repos="http://cran.us.r-project.org")
+```
+
+Now that they're installed, we need to load them and attach them to our path, alongside other pre-installed packages:
+
+```{r}
+library(mvtnorm)
+library(ggplot2)
+library(patchwork)
+library(BEDASSLE)
+```
+
+## R coding fundamentals
+
+R's simplest function is as a calculator. Try running this:
+
+```{r}
+2+2
+```
+
+Try the help commands:
+
+```{r}
+help(solve)
+```
+
+This is equivalent to:
+
+```{r}
+?solve()
+```
+
+Now, for the most basic operation - assigning values to variables. The basic data structure is a vector, which can have one variable or a string of variables of the same type (more on that later). To assign a single value to a variable you can use the '=' or the left arrow:
+
+```{r}
+x = 2
+x <- 2
+```
+
+You'll notice that nothing happens when you do this. The value 2 has been assigned to the variable x. Now to see the result, you can type:
+
+```{r}
+x
+```
+
+Now to assign a series of values as a vector (sort of like a one-dimensional set of values), you use the 'c' command, which stands for 'concatenate'
+
+```{r}
+x <- c(10,4,5.6,3.1)
+x
+```
+
+You can also assign the other direction:
+
+```{r}
+c(10,4,5.6,3.1) -> x
+x
+```
+
+Vectors can be strung together in assignments to other variables:
+
+```{r}
+y <- c(x,0,x)
+y
+```
+
+Vectors of successive integers can be created without using the c() command, instead using the colon ':'. You've seen above how to look at the result of your assignments by typing the variables name. I'm going to leave that out now, and after each assignment you can check the result yourself. You can also use a semicolon to place a second command on the same line, and check the result there:
+
+```{r}
+x <- 1:10; x
+x <- 23:36
+x <- 15:5
+```
+
+Arithmetic is conducted on vector values element by element:
+
+```{r}
+x <- c(1,2,3)
+```
+
+```{r}
+x
+```
+
+```{r}
+2*x
+```
+
+```{r}
+x^2
+```
+
+When two vectors are used in an operation, the shorter one will be recycled until it reaches the length of the longer one. This provides you with great flexibility and power, but with power comes danger!! Be very careful that the recycling accomplished what you intended! In the simple case where one vector is a single value, it's a simple result:
+
+```{r}
+x <- c(1,2,3)
+y <- 3
+x*y
+```
+
+When both have more than one value it is trickier:
+
+```{r}
+x <- c(1,2,3,4)
+y <- c(5,10)
+x*y
+```
+
+In other words, y is recycled to become c(5,10,5,10). But what about this:
+
+```{r}
+x <- c(1,2,3)
+y <- c(5,10)
+x*y
+```
+
+Now y is recycled to become c(5,10,5), matching the length of x. But R is suspicious that maybe you didn't mean to do this and gives a warning because the longer object's length is not a multiplier of the shorter object's length.
+
+R provides the full range of normal mathematical expressions, which can be used with any vector: log(), exp(), sign(), sin(), cos(), tan(), sqrt(), \^, etc.
+
+R has all the basic statistical functions (and many more you'll learn as you go along) that can be applied to vectors
+
+```{r}
+x <- 1:10
+max(x)
+```
+
+```{r}
+min(x)
+```
+
+```{r}
+length(x) #to get sample size
+```
+
+```{r}
+mean(x)
+```
+
+```{r}
+sd(x) # standard deviation
+```
+
+and look how easily you can write the expression for the mean:
+
+```{r}
+sum(x)/length(x)
+```
+
+Sort a vector:
+
+```{r}
+x <- c(3,1,5,7,2,10)
+sort(x)
+```
+
+# Question 1
+
+Using one line of code, compute the range (maximum minus minimum) of the vector x that we created above.
+
+```{r}
+#YOUR CODE HERE
+```
+
+## Missing values:
+
+Handling missing values is critical (especially for biogeographers!) and R has a special value 'NA'. The function is.na(x) then checks for the presence of NAs, returning a boolean
+
+```{r}
+x <- c(1,3,3,NA)
+is.na(x)
+```
+
+Note that the values FALSE and TRUE are coerced to 0 and 1, respectively, for arithmetic expressions. Thus you can calculate the number of missing values as:
+
+```{r}
+y <- is.na(x)
+sum(y)
+```
+
+Note that doing this in two steps leaves you with an extra variable 'y' floating around. This can be deleted from your workspace:
+
+```{r}
+rm(y)
+exists("y")
+```
+
+More generally, you can nest expressions to avoid creating these unwanted intermediate variables:
+
+```{r}
+sum(is.na(x))
+```
+
+Note that any NA in an arithmetic expression leads to an NA result:
+
+```{r}
+2 + NA
+```
+
+Thus, all standard statistical operators also return NA
+
+```{r}
+x <- c(1,2,3,NA)
+sum(x)
+```
+
+All of these functions have an optional argument 'na.rm' which stands for 'remove NAs'. The default value is FALSE, and you need to switch it to TRUE to handle data with NAs:
+
+```{r}
+sum(x,na.rm=T)
+mean(x,na.rm=T)
+```
+
+# Question 2
+
+Why do you think R's default behavior is to yield an NA result if you try to feed data containing NAs into a function?
+
+YOUR ANSWER HERE
+
+# Data frames
+
+As you've been noticing, one key type of object used in R is the vector. Another is the data frame. A data frame is like a table. Each row corresponds to a "thing" (countries, people, ice cream flavors, etc.), and each column represents an attribute of those things (name, height, nutritional content, etc.). You can think of a data frame as a bunch of vertical vectors (one for each variable) attached together horizontally. R comes with a built-in data frame called "mtcars". Let's check it out.
+
+```{r, echo=FALSE, fig.show=if(!knitr::is_latex_output()) 'asis' else 'hide'}
+head(mtcars) # view the first six rows
+```
+
+You can isolate one particular vector (i.e., column) in a data frame using a dollar sign like this:
+
+```{r}
+mtcars$mpg
+```
+
+# Question 3
+
+Using one line of code, compute the mean number of cylinders in the mtcars data set
+
+```{r}
+#YOUR CODE HERE
+```
+
+# Landscape genomics of Lemmon's willow (Salix lemmonii)
+
+Load a data frame containing data on each of the 40 sampling sites. Data frames are like tables, which you can think of as a collection of vectors. Look at the first six rows (i.e., sites):
+
+```{r, echo=FALSE, fig.show=if(!knitr::is_latex_output()) 'asis' else 'hide'}
+sitedata <- readRDS("sitedata.RDS")
+head(sitedata)
+```
+
+x and y are the geographic coordinates (in an arbitrary coordinate system). snowpack2 and maymin2 are the April 1 snowpack (in mm) and minimum May temperature (in °C) of each site. snowpack and maymin are the same variables rescaled to have mean 0 and standard deviation 1. These are better for building statistical models.
+
+Let's map snowpack2 and maymin2:
+
+```{r, echo=FALSE, fig.show=if(!knitr::is_latex_output()) 'asis' else 'hide'}
+snowmap <- ggplot(sitedata, aes(x=x, y=y, color=snowpack2))+
+  geom_point(size=3)+
+  scale_color_viridis_c(name="April 1\nSnowpack\n(mm)")+
+  theme_bw()+
+  theme(aspect.ratio=1)
+tempmap <- ggplot(sitedata, aes(x=x, y=y, color=maymin2))+
+  geom_point(size=3)+
+  scale_color_viridis_c(name="Minimum\nMay\nTemperature\n°C")+
+  theme_bw()+
+  theme(aspect.ratio=1)
+snowmap+tempmap
+```
+
+# Question 4
+
+Note the geographic patterns in April snowpack and minimum May temperature. For each climate variable, on average, do you think sites that are closer geographically are more climatically similar, less similar, or neither?
+
+YOUR ANSWER HERE
+
+Let's simulate genetic data for one biallelic SNP--i.e., one place in the genome, where each chromosome in each organism can have either one nucleotide or the other. In nature, we call the four nucleotides A, T, G, and C, but since we are effectively dealing with a binary variable in this toy scenario, we'll just call our two alleles 0 and 1, for mathematical convenience. For each population, then some percentage of all chromosomes possessed by all individuals will have a 1 at this locus (i.e., place in the genome), rather than a zero. This is the percentage we will simulate for all 40 populations in our "sitedata" data frame.
+
+To simulate our data, we are going to assume that snowpack and temperature have no effect on the allele frequency at all. We're going to completely ignore them. Instead, we'll assume that only other variables we can't measure have an effect--e.g., migration, genetic drift, and adaptation to other environmental variables we don't have data for (like soil chemistry or density of herbivores). In practice, this means we can simulate the data with the simple assumption that sites which are closer together should have more similar allele frequencies. This pattern--more similar genetics among more neighboring populations--is called **isolation by distance**. Finally, VERY IMPORTANTLY, we are not simulating any effect of snowpack or temperature on allele frequencies. Here's how we simulate that:
+
+```{r, echo=FALSE, fig.show=if(!knitr::is_latex_output()) 'asis' else 'hide'}
+distmat <- as.matrix(dist(sitedata[c("x", "y")])) # get site distance matrix
+
+# define spatially structured covariance matrix (no worries if that sounds like gibberish)
+covmat <- exp(-distmat^2)
+
+# define a quick helper function:
+expit <- function(val){
+  1/(1+exp(-val)) 
+}
+
+set.seed(59)
+sitedata$p1allele <- expit(scale(as.vector(rmvnorm(n=1, mean=rep(0,times=nrow(sitedata)), sigma=covmat)))) # simulate the data
+
+# map the data
+allelemap <- ggplot(sitedata, aes(x=x, y=y, color=p1allele))+
+  geom_point(size=3)+
+  scale_color_viridis_c(name="F(1)")+
+  theme_bw()+
+  theme(aspect.ratio=1)
+allelemap
+```
+
+Let's see how the allele frequencies relate to the climate variables:
+
+```{r, echo=FALSE, fig.show=if(!knitr::is_latex_output()) 'asis' else 'hide'}
+p1_vs_snow <- ggplot(sitedata, aes(x=snowpack2, y=p1allele))+
+  xlab("April 1 Snowpack (mm)")+
+  ylab("F(1)")+
+  geom_point()+
+  theme_bw()+
+  theme(aspect.ratio=1)
+p1_vs_temp <- ggplot(sitedata, aes(x=maymin2, y=p1allele))+
+  xlab("Minimum May Temperature (°C)")+
+  ylab("F(1)")+
+  geom_point()+
+    theme_bw()+
+  theme(aspect.ratio=1)
+p1_vs_snow + p1_vs_temp
+```
+
+# Question 5
+
+Do you see any non-random relationship between the frequency of the "1" allele and either climate variable?
+
+YOUR ANSWER HERE
+
+# Question 6
+
+If we see a relationship between either climate variable and the frequency of the 1 allele, does this mean the climate variable is causing natural selection on our gene of interest, or is there another cause? Explain why or why not. Remember that we just simulated these allele frequency data, so we know everything there is to know about how they were generated.
+
+YOUR ANSWER HERE
+
+# Question 7
+
+If we really want to assess whether there's evidence that snowpack and temperature affect the frequency of the 1 allele, then what "lurking variable" would we need to control for in our statistical model? How does BEDASSLE control for it?
+
+YOUR ANSWER HERE
+
+# BEDASSLE
+
+Let's get ready to analyze our data with the BEDASSLE R package.
+
+First, we need to load our "real" allele frequency data (not the toy locus we simulated above):
+
+```{r}
+dcounts <- readRDS("dcounts.RDS") # counts of the 1 allele at each site
+dsampsiz <- readRDS("dsampsiz.RDS") # alleles sampled at each site
+```
+
+Now we need to make distance matrices that tell us how geographically distant each pair of sites is, as well as how similar they are with respect to each climate variable. We already made the geographic distance matrix earlier, so we can just make the climate ones:
+
+```{r}
+distmat_snowpack <- as.matrix(dist(sitedata$snowpack))
+distmat_maymin <- as.matrix(dist(sitedata$maymin))
+distmat_env <- list(distmat_snowpack, distmat_maymin)
+```
+
+Now let's build the model. These models are rather complicated, so it's important to remind ourselves of the big picture of what we're doing with BEDASSLE. We are assuming that the biological story or "process" that produced our data can be described by equations containing a set of parameters, whose values we want to estimate as best we can from the data. (For example, one is the **"isolation by distance"** parameter.) There are many settings to deal with in the code below, and we won't worry about the details. Most of them are there to help make the model-building algorithm work efficiently. Ask me if you're curious. We'll set things up to give us updates every so often while the model is running.
+
+```{r}
+testmod <- BEDASSLE::MCMC(counts=dcounts,
+                          sample_sizes=dsampsiz,
+                          D=distmat,
+                          E=distmat_env,
+                          k=nrow(dcounts),
+                          loci=ncol(dcounts),
+                          delta=1e-4,
+                          ngen=1e4,
+                          savefreq=1000,
+                          samplefreq=10,
+                          aD_stp=0.01,
+                          aE_stp=0.01,
+                          a2_stp=0.01,
+                          thetas_stp=0.1,
+                          mu_stp=0.1,
+                          printfreq=1000,
+                          prefix="testmod_")
+```
+
+We built this model using Markov Chain Monte Carlo, a type of algorithm that searches around the space of values our model parameters could take, giving us an estimate of how probable different parameter values seem to be. One key step in our workflow is to make sure this algorithm seems to have explored thoroughly enough. Let's do that now using tools called trace plots. If our model-building algorithm ran sufficiently long, then the trace plots should look like fuzzy caterpillars sitting horizontally, with no difference in the pattern of fuzziness among different sections of the graph. If you see sloping trends, cyclical patterns, "jumping caterpillars", inconsistent fuzziness, or any other kind of pattern, then we have model-building problems. To see our trace plots, you'll need to hit enter a few times in the command console, as prompted. You can click on the thumbnail of each plot to view it zoomed in.
+
+```{r, echo=FALSE, fig.show=if(!knitr::is_latex_output()) 'asis' else 'hide'}
+load("testmod_MCMC_output1.Robj") # load our results
+plot_all_trace("testmod_MCMC_output1.Robj", percent.burnin=10)
+```
+
+# Question 8
+
+Do you think we ran our model for long enough? Why or why not?
+
+YOUR ANSWER HERE
+
+Let's load a pre-built model I ran for much longer. (This took about 3 hours on my laptop.) We'll then check the trace plots.
+
+```{r, echo=FALSE, fig.show=if(!knitr::is_latex_output()) 'asis' else 'hide'}
+load("mod1_MCMC_output1.Robj")
+plot_all_trace("mod1_MCMC_output1.Robj", percent.burnin=10)
+```
+
+These look good.
+
+Let's explore our results. Remember the big picture of what we're doing with BEDASSLE. We're assuming that the biological story or "process" that produced our data can be described by equations containing a set of parameters, whose values we want to estimate as best we can from the data. Each parameter plays a different role in the story.
+
+The code below produces a histogram of our estimates for each parameter in our hypothesized data-generating process. Each histogram summarizes our uncertainty about what value each parameter should take. For example, in the first histogram, we see that our best guess of a parameter called aE_1/aD is somewhere around 0.94. We're fairly sure it's somewhere between 0.8 and 1.1, and we're near certain it's between 0.7 and 1.2. One thing we're often interested in as scientists is whether a particular parameter is likely to be greater than zero, less than zero, or unclear which side it's on. In this case, we can be very confident that this parameter is greater than zero.
+
+We have a lot of model parameters, and for now, you don't need to worry about most of them. The key parameters are **aD**, **aE_1**, and **aE_2**. **aD** can be thought of as the effect of geographic distance on genetic similarity among populations. In other words, it's the **isolation by distance** parameter. **aE_1** and **aE_2** are the **isolation by environment** parameters. **aE_1** can be thought of as the "**isolation by snowpack"** parameter. In other words, it describes how strongly having similar April snowpack between sites increases their genetic similarity. **aE_2** is the same thing for minimum May temperature.
+
+```{r, echo=FALSE, fig.show=if(!knitr::is_latex_output()) 'asis' else 'hide'}
+plot_all_marginals("mod1_MCMC_output1.Robj", percent.burnin=10)
+```
+
+# Question 9
+
+Does our analysis suggest there is **isolation by distance** in our data? Support your answer by referring to the results above. Name two biological processes that could produce a pattern of isolation by distance.
+
+YOUR ANSWER HERE
+
+# Question 10
+
+Does our analysis suggest there is **isolation by environment** in our data? Support your answer by referring to the results above. If yes, explain why we think this pattern is real and a spurious result driven by geographic distance. If no, describe what kinds of results you would need to see to conclude "yes" instead.
+
+YOUR ANSWER HERE
+
+# Question 11
+
+Isolation by environment can be caused by multiple processes, including local adaptation--i.e., natural selection favoring different combinations of alleles in different environments. If all we had were the results above, it would never be appropriate to rule out alternative explanations, no matter how strong the patterns might be. However, in this case, we do have other evidence to draw on, as discussed in the lab intro slides. In light of both our results and this other evidence, do you think there is a strong case for local adaptation to April snowpack and/or minimum May temperatures?
+
+YOUR ANSWER HERE
+
+# Question 12
+
+Pretend you are a restoration practitioner planning a meadow restoration project in the Sierra Nevada, and you need to collect willow planting material. What kind of environment would you go to if you want willows that are resistant to both summer drought and spring freezes? Use these results, and the information in the lab intro slides, to inform your answer.
+
+YOUR ANSWER HERE
