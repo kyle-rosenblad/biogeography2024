@@ -326,45 +326,49 @@ expit <- function(val){
   1/(1+exp(-val)) 
 }
 
-set.seed(59)
+set.seed(7613)
 sitedata$p1allele <- expit(scale(as.vector(rmvnorm(n=1, mean=rep(0,times=nrow(sitedata)), sigma=covmat)))) # simulate the data
 
 # map the data
 allelemap <- ggplot(sitedata, aes(x=x, y=y, color=p1allele))+
   geom_point(size=3)+
-  scale_color_viridis_c(name="F(1)")+
+  scale_color_viridis_c(name="Allele\nFrequency")+
   theme_bw()+
   theme(aspect.ratio=1)
 allelemap
 ```
 
-Let's see how the allele frequencies relate to the climate variables:
+Let's see how differences between sites in allele frequencies relate to differences in the climate variables. Each point represents a pair of sites:
 
 ```{r, echo=FALSE, fig.show=if(!knitr::is_latex_output()) 'asis' else 'hide'}
-p1_vs_snow <- ggplot(sitedata, aes(x=snowpack2, y=p1allele))+
-  xlab("April 1 Snowpack (mm)")+
-  ylab("F(1)")+
+sitedata_dists <- data.frame(geodist=c(dist(sitedata[c("x", "y")])),
+                             snowpackdist=c(dist(sitedata$snowpack2)),
+                             tempdist=c(dist(sitedata$maymin2)),
+                             gendist=c(dist((sitedata$p1allele))))
+p1_vs_snow <- ggplot(sitedata_dists, aes(x=snowpackdist, y=gendist))+
+  xlab("Difference in April 1 Snowpack (mm)")+
+  ylab("Difference in Allele Frequency")+
   geom_point()+
   theme_bw()+
   theme(aspect.ratio=1)
-p1_vs_temp <- ggplot(sitedata, aes(x=maymin2, y=p1allele))+
-  xlab("Minimum May Temperature (°C)")+
-  ylab("F(1)")+
+p1_vs_temp <- ggplot(sitedata_dists, aes(x=tempdist, y=gendist))+
+  xlab("Difference in Minimum May Temperature (°C)")+
+  ylab("Difference in Allele Frequency")+
   geom_point()+
-    theme_bw()+
+  theme_bw()+
   theme(aspect.ratio=1)
 p1_vs_snow + p1_vs_temp
 ```
 
 # Question 5
 
-Do you see any non-random relationship between the frequency of the "1" allele and either climate variable?
+Do you see any non-random relationships in the plots above?
 
 YOUR ANSWER HERE
 
 # Question 6
 
-If we see a relationship between either climate variable and the frequency of the 1 allele, does this mean the climate variable is causing natural selection on our gene of interest, or is there another cause? Explain why or why not. Remember that we just simulated these allele frequency data, so we know everything there is to know about how they were generated.
+If we see a relationship between differences in either climate variable and differences in the frequency of the 1 allele, does this mean the climate variable is causing natural selection on our gene of interest, or is there another cause? Explain why or why not. Remember that we just simulated these allele frequency data, so we know everything there is to know about how they were generated.
 
 YOUR ANSWER HERE
 
